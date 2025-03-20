@@ -64,9 +64,9 @@ const initialState = {
     room: "",
   },
   confidential: {
-    person: "plum",
-    weapon: "knife",
-    room: "bedroom",
+    person: characters[Math.floor(Math.random() * 6)],
+    weapon: weapons[Math.floor(Math.random() * 6)],
+    room: board[Math.floor(Math.random() * 6)].type,
   },
 };
 
