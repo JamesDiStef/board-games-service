@@ -1,0 +1,30 @@
+
+
+GET http://localhost:3000/clue
+
+###
+
+
+
+POST http://localhost:3000/clue/james
+
+###
+
+POST http://localhost:3000/animals
+Content-Type: application/json
+
+{
+    "species": "abb",
+    "description" : "More closely related to Asian Black Bears then to Polar or Brown Bears in America",
+    "wiki": "https://en.wikipedia.org/wiki/American_black_bear"
+}
+###
+
+PATCH http://localhost:3000/clue/67d8dd395cb97102ab64f12d
+Content-Type: application/json
+
+{  
+    "isGameOver": true
+}
+
+
