@@ -19,6 +19,9 @@ app.use(express.json());
 const clueRouter = require("./routes/clue");
 app.use("/clue", clueRouter);
 
+const userRouter = require("./routes/user");
+app.use("/user", userRouter);
+
 app.listen(3000, () => console.log("Server started"));
 
 exports.api = functions.https.onRequest(app);

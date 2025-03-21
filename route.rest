@@ -1,12 +1,14 @@
 
 
-GET http://localhost:3000/clue
+GET http://localhost:3000/user/james
+
+
 
 ###
 
 
 
-POST http://localhost:3000/clue/james
+POST http://localhost:3000/user/greg
 
 ###
 
@@ -20,11 +22,13 @@ Content-Type: application/json
 }
 ###
 
-PATCH http://localhost:3000/clue/67d8dd395cb97102ab64f12d
+PATCH http://localhost:3000/user/67dd5b7d77006a6541641430
+// have to send user id here, then set the game fields
+// so...on create login page, create user.  then when user starts each game, if one doesnt already exist, create one and map id to the user.  then on playing each game, fetches or creates a game for the user
 Content-Type: application/json
 
 {  
-    "isGameOver": true
+    "clueId": "12312345"
 }
 
 

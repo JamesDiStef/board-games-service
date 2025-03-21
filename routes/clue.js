@@ -71,7 +71,6 @@ const initialState = {
 };
 
 router.get("/", async (req, res) => {
-  console.log("got here");
   try {
     const items = await clue.find();
     console.log(items);
@@ -135,19 +134,20 @@ router.patch("/:id", async (req, res) => {
   const updates = req.body;
 
   try {
-    const clue = await clue.findById(id);
+    const cg = await clue.findById(id);
 
-    if (!clue) {
+    if (!cg) {
       return res.status(404).json({ message: "Game not found" });
     }
 
     Object.keys(updates).forEach((key) => {
-      if (clue[key] !== undefined) {
-        clue[key] = updates[key];
+      if (cg[key] !== undefined) {
+        cg[key] = updates[key];
       }
     });
 
-    const updatedGame = await clue.save();
+    const updatedGame = await cg.save();
+    console.log(typeof updatedGame);
 
     res.status(200).json(updatedGame);
   } catch (err) {
