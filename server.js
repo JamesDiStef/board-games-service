@@ -22,6 +22,9 @@ app.use("/clue", clueRouter);
 const userRouter = require("./routes/user");
 app.use("/user", userRouter);
 
+const ticTacToeRouter = require("./routes/ticTacToe");
+app.use("/ticTacToe", ticTacToeRouter);
+
 app.listen(3000, () => console.log("Server started"));
 
 exports.api = functions.https.onRequest(app);
