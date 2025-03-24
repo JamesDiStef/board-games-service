@@ -25,6 +25,9 @@ app.use("/user", userRouter);
 const ticTacToeRouter = require("./routes/ticTacToe");
 app.use("/ticTacToe", ticTacToeRouter);
 
+const connectFourRouter = require("./routes/connectFour");
+app.use("/connectFour", connectFourRouter);
+
 app.listen(3000, () => console.log("Server started"));
 
 exports.api = functions.https.onRequest(app);
