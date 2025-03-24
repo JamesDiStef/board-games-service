@@ -8,7 +8,7 @@ GET http://localhost:3000/user/james
 
 
 
-POST http://localhost:3000/clue/james
+GET http://localhost:3000/ticTacToe/james
 
 ###
 
@@ -22,13 +22,13 @@ Content-Type: application/json
 }
 ###
 
-PATCH http://localhost:3000/user/james
+PATCH http://localhost:3000/ticTacToe/james
 // have to send user id here, then set the game fields
 // so...on create login page, create user.  then when user starts each game, if one doesnt already exist, create one and map id to the user.  then on playing each game, fetches or creates a game for the user
 Content-Type: application/json
 
 {  
-    "hangmanId": "fhdskfds"
+    "board": [{"id": 1, "value": "X"}]
 }
 
 

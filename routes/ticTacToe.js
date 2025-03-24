@@ -67,24 +67,26 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:userId", async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
   try {
-    const currentUser = await ticTacToe.findById(id);
+    const currentGame = await ticTacToe.findOne({
+      userId: req.params.userId,
+    });
 
-    if (!currentUser) {
+    if (!currentGame) {
       return res.status(404).json({ message: "Game not found" });
     }
 
     Object.keys(updates).forEach((key) => {
-      if (currentUser[key] !== undefined) {
-        currentUser[key] = updates[key];
+      if (currentGame[key] !== undefined) {
+        currentGame[key] = updates[key];
       }
     });
 
-    const updatedGame = await currentUser.save();
+    const updatedGame = await currentGame.save();
 
     res.status(200).json(updatedGame);
   } catch (err) {
