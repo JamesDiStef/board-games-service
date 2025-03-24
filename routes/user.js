@@ -75,12 +75,14 @@ router.post("/:userId", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:userId", async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
   try {
-    const currentUser = await user.findById(id);
+    const currentUser = await user.findOne({
+      userId: req.params.userId,
+    });
 
     if (!currentUser) {
       return res.status(404).json({ message: "Game not found" });

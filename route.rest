@@ -1,6 +1,6 @@
 
 
-GET http://localhost:3000/ticTacToe
+GET http://localhost:3000/user/james
 
 
 
@@ -8,7 +8,7 @@ GET http://localhost:3000/ticTacToe
 
 
 
-GET http://localhost:3000/ticTacToe/james
+POST http://localhost:3000/clue/james
 
 ###
 
@@ -22,13 +22,13 @@ Content-Type: application/json
 }
 ###
 
-PATCH http://localhost:3000/ticTacToe/67dd6285fafdb492ef7804ff
+PATCH http://localhost:3000/user/james
 // have to send user id here, then set the game fields
 // so...on create login page, create user.  then when user starts each game, if one doesnt already exist, create one and map id to the user.  then on playing each game, fetches or creates a game for the user
 Content-Type: application/json
 
 {  
-    "isGameOver": false
+    "hangmanId": "fhdskfds"
 }
 
 
