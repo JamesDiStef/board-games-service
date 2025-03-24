@@ -7,7 +7,85 @@ module.exports = router;
 const initialState = {
   isGameOver: false,
   isRedTurn: true,
-  columns: [],
+  columns: [
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+    {
+      counter: 5,
+      squares: [
+        { id: 0, color: "" },
+        { id: 1, color: "" },
+        { id: 2, color: "" },
+        { id: 3, color: "" },
+        { id: 4, color: "" },
+        { id: 5, color: "" },
+      ],
+    },
+  ],
 };
 
 router.get("/", async (req, res) => {
