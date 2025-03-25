@@ -1,34 +1,20 @@
 
 
-POST http://localhost:3000/connectFour/james
-
-
+POST http://localhost:3000/hangman/james
 
 ###
 
-
-
-GET http://localhost:3000/connectFour/james
+GET http://localhost:3000/hangman/james
 
 ###
 
-POST http://localhost:3000/animals
-Content-Type: application/json
-
-{
-    "species": "abb",
-    "description" : "More closely related to Asian Black Bears then to Polar or Brown Bears in America",
-    "wiki": "https://en.wikipedia.org/wiki/American_black_bear"
-}
-###
-
-PATCH http://localhost:3000/connectFour/james
+PATCH http://localhost:3000/hangman/james
 // have to send user id here, then set the game fields
 // so...on create login page, create user.  then when user starts each game, if one doesnt already exist, create one and map id to the user.  then on playing each game, fetches or creates a game for the user
 Content-Type: application/json
 
 {  
-    "column1": [{"id": 1, "value": "X"}]
+    "isWin": false
 }
 
 

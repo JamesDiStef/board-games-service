@@ -1,5 +1,5 @@
 // comment out to deploy, comment in to run locally:
-// require("dotenv").config();
+require("dotenv").config();
 
 const express = require("express");
 const app = express();
@@ -27,6 +27,9 @@ app.use("/ticTacToe", ticTacToeRouter);
 
 const connectFourRouter = require("./routes/connectFour");
 app.use("/connectFour", connectFourRouter);
+
+const hangmanRouter = require("./routes/hangman");
+app.use("/hangman", hangmanRouter);
 
 app.listen(3000, () => console.log("Server started"));
 
