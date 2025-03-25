@@ -9,7 +9,7 @@ const initialState = {
   isWin: false,
   wordToGuess: "",
   guessedLetters: [],
-  wrongGuesses: [],
+  wrongGuesses: 0,
 };
 
 router.get("/", async (req, res) => {

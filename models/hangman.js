@@ -5,7 +5,7 @@ const hangmanSchema = new mongoose.Schema({
   isWin: Boolean,
   wordToGuess: String,
   guessedLetters: [String],
-  wrongGuesses: [String],
+  wrongGuesses: Number,
 });
 
 module.exports = mongoose.model("hangman", hangmanSchema);
