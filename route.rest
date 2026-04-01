@@ -1,20 +1,48 @@
-
-
-POST http://localhost:3000/hangman/james
-
-###
-
-GET http://localhost:3000/hangman/james
-
-###
-
-PATCH http://localhost:3000/hangman/james
-// have to send user id here, then set the game fields
-// so...on create login page, create user.  then when user starts each game, if one doesnt already exist, create one and map id to the user.  then on playing each game, fetches or creates a game for the user
+### REGISTER
+POST http://localhost:3000/auth/register
 Content-Type: application/json
 
-{  
-    "isWin": false
+{
+  "userId": "jamestesting",
+  "password": "testpassword123"
 }
 
+###
 
+### LOGIN — copy the token from the response and paste below
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "userId": "jamestesting",
+  "password": "testpassword123"
+}
+
+###
+
+### GET USER (auth required)
+GET http://localhost:3000/user/jamestesting
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### GET HANGMAN (auth required)
+GET http://localhost:3000/hangman/jamestesting
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### CREATE HANGMAN GAME (auth required)
+POST http://localhost:3000/hangman/jamestesting
+Authorization: Bearer PASTE_TOKEN_HERE
+
+###
+
+### UPDATE HANGMAN (auth required)
+PATCH http://localhost:3000/hangman/jamestesting
+Authorization: Bearer PASTE_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "isWin": false
+}

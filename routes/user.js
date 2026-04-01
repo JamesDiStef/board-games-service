@@ -38,6 +38,9 @@ router.get("/", async (req, res) => {
 // });
 
 router.get("/:userId", async (req, res) => {
+  if (req.userId !== req.params.userId) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   console.log(req.params.userId);
   try {
     const currentUser = await user.find({
@@ -50,6 +53,9 @@ router.get("/:userId", async (req, res) => {
 });
 
 router.post("/:userId", async (req, res) => {
+  if (req.userId !== req.params.userId) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   console.log(req.params.userId);
 
   const currentUser = await user.find({
@@ -76,6 +82,9 @@ router.post("/:userId", async (req, res) => {
 });
 
 router.patch("/:userId", async (req, res) => {
+  if (req.userId !== req.params.userId) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   const { id } = req.params;
   const updates = req.body;
 

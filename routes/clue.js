@@ -93,6 +93,9 @@ router.get("/", async (req, res) => {
 // });
 
 router.get("/:playerName", async (req, res) => {
+  if (req.userId !== req.params.playerName) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   console.log(req.params.playerName);
   try {
     const game = await clue.find({
@@ -105,6 +108,9 @@ router.get("/:playerName", async (req, res) => {
 });
 
 router.post("/:playerName", async (req, res) => {
+  if (req.userId !== req.params.playerName) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   console.log(req.params.playerName);
 
   const game = await clue.find({
@@ -129,12 +135,14 @@ router.post("/:playerName", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
-  const { id } = req.params;
+router.patch("/:playerName", async (req, res) => {
+  if (req.userId !== req.params.playerName) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
   const updates = req.body;
 
   try {
-    const cg = await clue.findById(id);
+    const cg = await clue.findOne({ playerName: req.params.playerName });
 
     if (!cg) {
       return res.status(404).json({ message: "Game not found" });
