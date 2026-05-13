@@ -7,9 +7,11 @@ require("dotenv").config();
 //   ALLOWED_ORIGIN — comma-separated list of allowed frontend origins (e.g. http://localhost:5173,https://board-games-and-more.netlify.app)
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const app = express();
+const httpServer = http.createServer(app);
 const mongoose = require("mongoose");
-const functions = require("firebase-functions");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
@@ -19,6 +21,11 @@ const allowedOrigins = (process.env.ALLOWED_ORIGIN || "http://localhost:5173")
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(cookieParser());
+
+const io = new Server(httpServer, {
+  cors: { origin: allowedOrigins, credentials: true },
+});
+require("./socket")(io);
 
 mongoose.connect(process.env.DATA_URL);
 const db = mongoose.connection;
@@ -47,6 +54,8 @@ app.use("/connectFour", auth, connectFourRouter);
 const hangmanRouter = require("./routes/hangman");
 app.use("/hangman", auth, hangmanRouter);
 
-app.listen(3000, () => console.log("Server started"));
+const multiplayerRouter = require("./routes/multiplayer");
+app.use("/multiplayer", auth, multiplayerRouter(io));
 
-exports.api = functions.https.onRequest(app);
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => console.log(`Server started on port ${PORT}`));

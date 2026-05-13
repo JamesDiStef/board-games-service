@@ -1,6 +1,6 @@
 # board-games-service — Backend Context
 
-Express REST API backing the `board-games` frontend. Deployed to Firebase Cloud Functions. See top-level `CLAUDE.md` for full-stack context and `ROADMAP.md` for planned work.
+Express REST API backing the `board-games` frontend. Deployed to Google Cloud Run. See top-level `CLAUDE.md` for full-stack context and `ROADMAP.md` for planned work.
 
 ---
 
@@ -9,7 +9,8 @@ Express REST API backing the `board-games` frontend. Deployed to Firebase Cloud 
 - **Runtime:** Node.js 22
 - **Framework:** Express 4
 - **Database:** MongoDB Atlas via Mongoose 8
-- **Deployment:** Firebase Cloud Functions (`exports.api = functions.https.onRequest(app)`)
+- **Real-time:** Socket.io 4
+- **Deployment:** Google Cloud Run (`gcloud run deploy`)
 - **Dev server:** nodemon on port 3000
 
 ## Run
@@ -17,36 +18,57 @@ Express REST API backing the `board-games` frontend. Deployed to Firebase Cloud 
 ```bash
 npm install
 npm run dev        # nodemon server.js → http://localhost:3000
-npm run deploy     # firebase deploy --only functions:api
+```
+
+## Deploy
+
+```bash
+cd board-games-service
+gcloud run deploy board-games-service \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --env-vars-file .env.yaml
 ```
 
 ## Environment
 
 ```
 DATA_URL=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/<db>
+JWT_SECRET=<signing key>
+ALLOWED_ORIGIN=http://localhost:5173,https://board-games-and-more.netlify.app
 ```
 
-For Firebase deployment: set `DATA_URL` via Firebase environment config (`firebase functions:config:set`), not `.env` — the dotenv line in `server.js` is commented out for production.
+Set locally in `.env`. For Cloud Run, set in `.env.yaml` (excluded from Docker via `.dockerignore`).
 
 ---
 
 ## File Structure
 
 ```
-server.js           # Express app + Mongoose connection + route mounting
+server.js               # Express app + http server + Socket.io + Mongoose + route mounting
+Dockerfile              # Cloud Run container definition
+.env.yaml               # Cloud Run env vars (gitignored)
+socket/
+  index.js              # Socket.io event handlers (join-game-room)
 models/
-  user.js           # User → { userId, clueId, ticTacId, connectFourId, hangmanId }
-  ticTacToe.js      # { userId, isGameOver, isPlayerOne, board[9] }
-  connectFour.js    # { userId, isGameOver, isRedTurn, columns[7] }
-  hangman.js        # { userId, isWin, wordToGuess, guessedLetters[], wrongGuesses }
-  clue.js           # Full Clue game state (see schema below)
+  user.js               # User → { userId, clueId, ticTacId, connectFourId, hangmanId }
+  ticTacToe.js          # { userId, isGameOver, isPlayerOne, board[9] }
+  connectFour.js        # { userId, isGameOver, isRedTurn, columns[7] }
+  hangman.js            # { userId, isWin, wordToGuess, guessedLetters[], wrongGuesses }
+  clue.js               # Full Clue game state (see schema below)
+  multiplayerGame.js    # { roomCode, gameType, hostId, guestId, board, currentTurn, isGameOver, winner }
 routes/
-  user.js           # GET /, GET /:userId, POST /:userId, PATCH /:userId
-  ticTacToe.js      # GET /, GET /:userId, POST /:userId, PATCH /:userId
-  connectFour.js    # GET /, GET /:userId, POST /:userId, PATCH /:userId
-  hangman.js        # GET /, GET /:userId, POST /:userId, PATCH /:userId
-  clue.js           # GET /, GET /:playerName, POST /:playerName, PATCH /:id  ← uses ObjectId, inconsistent
-route.rest          # Manual test file for VS Code REST Client extension
+  auth.js               # POST /auth/register, POST /auth/login, POST /auth/logout
+  user.js               # GET /, GET /:userId, POST /:userId, PATCH /:userId
+  ticTacToe.js          # GET /, GET /:userId, POST /:userId, PATCH /:userId
+  connectFour.js        # GET /, GET /:userId, POST /:userId, PATCH /:userId
+  hangman.js            # GET /, GET /:userId, POST /:userId, PATCH /:userId
+  clue.js               # GET /, GET /:playerName, POST /:playerName, PATCH /:playerName
+  multiplayer.js        # See multiplayer routes below
+middleware/
+  auth.js               # JWT cookie verification → sets req.userId
+route.rest              # Manual test file for VS Code REST Client extension
 ```
 
 ---
@@ -57,8 +79,11 @@ All routes return JSON. POST returns 201. Errors return 400/404/500 with `{ mess
 
 | Method | Path | Description |
 |---|---|---|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login, sets HttpOnly JWT cookie |
+| POST | `/auth/logout` | Clears JWT cookie |
 | GET | `/user/:userId` | Fetch user and their game IDs |
-| POST | `/user/:userId` | Create user (blocks duplicate userIds) |
+| POST | `/user/:userId` | Create user (blocks duplicates) |
 | PATCH | `/user/:userId` | Update user fields |
 | GET | `/ticTacToe/:userId` | Fetch user's Tic-Tac-Toe game |
 | POST | `/ticTacToe/:userId` | Create new game (blocks duplicates) |
@@ -71,17 +96,34 @@ All routes return JSON. POST returns 201. Errors return 400/404/500 with `{ mess
 | PATCH | `/hangman/:userId` | Update game state |
 | GET | `/clue/:playerName` | Fetch Clue game by player name |
 | POST | `/clue/:playerName` | Create new Clue game |
-| PATCH | `/clue/:id` | Update Clue game by MongoDB ObjectId **(inconsistent — should be :playerName)** |
+| PATCH | `/clue/:playerName` | Update Clue game state |
+| POST | `/multiplayer/create` | Create multiplayer game, returns roomCode |
+| POST | `/multiplayer/join` | Join game by roomCode |
+| GET | `/multiplayer/games` | Fetch all active games for current user |
+| GET | `/multiplayer/:roomCode` | Fetch single game (host/guest only) |
+| PATCH | `/multiplayer/:roomCode/move` | Save move to DB, emits `move-made` via Socket.io |
+
+---
+
+## Socket.io Events
+
+| Event (client → server) | Payload | Description |
+|---|---|---|
+| `join-game-room` | `{ roomCode }` | Client joins the Socket.io room for that game |
+
+| Event (server → client) | Payload | Description |
+|---|---|---|
+| `move-made` | `{ game }` | Broadcast to room after a move is saved to DB |
 
 ---
 
 ## Conventions
 
 - **PATCH pattern:** All PATCH routes iterate `req.body` keys and assign them to the document, then call `.save()`. Any valid model field can be patched in one call.
-- **Duplicate prevention:** POST routes check for an existing document before creating. Returns 400 if already exists.
-- **Initial state:** Each route file defines its own `initialState` object used when creating a new game via POST.
-- **CORS:** Fully open (`origin: true`) — intentional for the public API.
-- **No auth:** `userId` is trusted from the URL param with no verification. Auth is planned (see ROADMAP.md Phase 1 / BACKLOG.md Epic 1).
+- **Duplicate prevention:** POST routes check for an existing document before creating.
+- **Auth:** All routes except `/auth/*` are protected by `middleware/auth.js`. JWT is read from HttpOnly cookie `bgToken`. Sets `req.userId`.
+- **multiplayer.js exports a factory function** `(io) => router` so routes can emit Socket.io events. All other route files export a plain router.
+- **CORS:** Controlled via `ALLOWED_ORIGIN` env var — comma-separated list of allowed origins.
 
 ---
 
@@ -116,8 +158,5 @@ Clue constants (defined in `routes/clue.js`):
 
 ## Known Issues
 
-- **No authentication** — all endpoints are open; auth is the first item in BACKLOG.md
 - **No input validation** — request bodies are written directly to MongoDB without sanitization
-- **Clue PATCH uses ObjectId** (`/clue/:id`) instead of `/:playerName` like every other route — needs to be normalized when auth is added
-- **Unused import** — `routes/user.js` imports a Firebase Crashlytics function that is never called
-- **No logging** — no structured request logging; errors surface only if Firebase logs them
+- **No logging** — no structured request logging (Feature 4.1 in backlog)

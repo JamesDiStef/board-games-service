@@ -1,5 +1,6 @@
 .env
 .env.production
+.env.yaml
 node_modules
 firebase.json
 .firebaserc

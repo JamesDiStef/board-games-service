@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const user = require("../models/user");
-const { params } = require("firebase-functions");
-const {
-  onNewAnrIssuePublished,
-} = require("firebase-functions/v2/alerts/crashlytics");
 
 module.exports = router;
 
@@ -70,8 +66,6 @@ router.post("/:userId", async (req, res) => {
 
   let nu = new user(initialState);
   nu.userId = req.params.userId;
-
-  console.log(onNewAnrIssuePublished);
 
   try {
     const newUser = await nu.save();
